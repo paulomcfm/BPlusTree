@@ -33,6 +33,23 @@ public class BPlusTree
         return parent;
     }
 
+    public void inOrdem()
+    {
+        in_ordem(root);
+    }
+
+    private void in_ordem(Node no)
+    {
+        if(no!=null)
+        {
+            for(int i=0; i<no.getTl(); i++)
+            {
+                in_ordem(no.getvLig(i));
+                System.out.println(no.getvInfo(i));
+            }
+            in_ordem(no.getvLig(no.getTl()));
+        }
+    }
     private void split(Node leaf, Node parent)
     {
         if(leaf.getvLig(0)==null){
@@ -332,40 +349,19 @@ public class BPlusTree
 
     public void remove(int info)
     {
-        Node subL, subR, leaf;
-        Node node = locateNode(info);
-        if (node!=null)
+        Node subL, subR;
+        Node leaf = locateNode(info);
+        if (leaf!=null)
         {
-            int pos = node.getPosition(info);
-            if(node.getvLig(0)!=null)
-            {
-                subL = locateSubL(node, pos);
-                subR = locateSubR(node, pos+1);
-                if(subL.getTl()> Node.m || subR.getTl()== Node.m)
-                {
-                    node.setvInfo(pos, subL.getvInfo(subL.getTl()-1));
-                    node.setvPos(pos, subL.getvPos(subL.getTl()-1));
-                    leaf = subL;
-                    pos = subL.getTl()-1;
-                }
-                else
-                {
-                    node.setvInfo(pos, subR.getvInfo(0));
-                    node.setvPos(pos, subR.getvPos(0));
-                    leaf = subR;
-                    pos = 0;
-                }
-            }
-            else
-                leaf = node;
+            int pos = leaf.getPosition(info);
 
             leaf.rearrangeExclusion(pos);
-            leaf.setTl(node.getTl()-1);
+            leaf.setTl(leaf.getTl()-1);
 
             if(leaf == root && leaf.getTl()==0)
                 root = null;
             else
-            if(leaf != root && leaf.getTl()< Node.m)
+            if(leaf != root && leaf.getTl()< (int)Math.ceil((double)(Node.m)/2)-1)
                 redistributeConcatenate(leaf);
         }
     }
