@@ -24,7 +24,7 @@ public class Node {
 
     public int getPosition(int info){
         int pos = 0;
-        while(pos<TL && info>vInfo[pos])
+        while(pos<TL && info>=vInfo[pos])
             pos++;
         return pos;
     }

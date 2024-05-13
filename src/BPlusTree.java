@@ -61,15 +61,15 @@ public class BPlusTree
             cx2.setPrev(cx1);
             int posParent = parent.getPosition(leaf.getvInfo(0));
             Node leftS = null, rightS = null;
-            if (parent!=leaf && posParent-1 >= 0) //posParent pra crescente
-                leftS = parent.getvLig(posParent-1); //posParent pra crescente
+            if (parent!=leaf && posParent-1 >= 0)
+                leftS = parent.getvLig(posParent-1);
             else{
                 Node grandParent = locateParent(parent, parent.getvInfo(0));
                 int posGrandParent = grandParent.getPosition(parent.getvInfo(0));
                 if (grandParent!=parent && posGrandParent-1 >=0)
                     leftS = locateSubL(grandParent, posGrandParent-1);
             }
-            if (parent!=leaf && posParent+1 <= parent.getTl()) //posParent+2 pra crescente
+            if (parent!=leaf && posParent+1 <= parent.getTl())
                 rightS = parent.getvLig(posParent+1);
             else{
                 Node grandParent = locateParent(parent, parent.getvInfo(0));
