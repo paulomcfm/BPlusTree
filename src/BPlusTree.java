@@ -78,21 +78,30 @@ public class BPlusTree
             cx2.setPrev(cx1);
             int posParent = parent.getPosition(leaf.getvInfo(0));
             Node leftS = null, rightS = null;
-            if (parent!=leaf && posParent-1 >= 0)
-                leftS = parent.getvLig(posParent-1);
-            else{
-                Node grandParent = locateParent(parent, parent.getvInfo(0));
-                int posGrandParent = grandParent.getPosition(parent.getvInfo(0));
-                if (grandParent!=parent && posGrandParent-1 >=0)
-                    leftS = locateSubL(grandParent, posGrandParent-1);
+            if(leaf.getPrev()!=null){
+                leftS = leaf.getPrev();
             }
-            if (parent!=leaf && posParent+1 <= parent.getTl())
-                rightS = parent.getvLig(posParent+1);
             else{
-                Node grandParent = locateParent(parent, parent.getvInfo(0));
-                int posGrandParent = grandParent.getPosition(parent.getvInfo(0));
-                if (grandParent!=parent && posGrandParent+1<grandParent.getTl())
-                    rightS = locateSubR(grandParent, posGrandParent+1);
+                if (parent != leaf && posParent - 1 >= 0)
+                    leftS = parent.getvLig(posParent - 1);
+                else {
+                    Node grandParent = locateParent(parent, parent.getvInfo(0));
+                    int posGrandParent = grandParent.getPosition(parent.getvInfo(0));
+                    if (grandParent != parent && posGrandParent - 1 >= 0)
+                        leftS = locateSubL(grandParent, posGrandParent - 1);
+                }
+            }
+            if(leaf.getNext()!=null){
+                rightS = leaf.getNext();
+            }else{
+                if (parent != leaf && posParent + 1 <= parent.getTl())
+                    rightS = parent.getvLig(posParent + 1);
+                else {
+                    Node grandParent = locateParent(parent, parent.getvInfo(0));
+                    int posGrandParent = grandParent.getPosition(parent.getvInfo(0));
+                    if (grandParent != parent && posGrandParent + 1 < grandParent.getTl())
+                        rightS = locateSubR(grandParent, posGrandParent + 1);
+                }
             }
             if(leftS!=null){
                 leftS.setNext(cx1);
@@ -140,11 +149,11 @@ public class BPlusTree
             cx1.setvLig(max, leaf.getvLig(max));
             cx1.setTl(max);
 
-            for(int i = max+1; i<leaf.getTl() ; i++)
+            for(int i = max+1; i<leaf.getTl(); i++)
             {
-                cx2.setvInfo(max+1-i, leaf.getvInfo(i));
-                cx2.setvPos(max+1-i, leaf.getvPos(i));
-                cx2.setvLig(max+1-i, leaf.getvLig(i));
+                cx2.setvInfo(i-(max+1), leaf.getvInfo(i));
+                cx2.setvPos(i-(max+1), leaf.getvPos(i));
+                cx2.setvLig(i-(max+1), leaf.getvLig(i));
                 cx2.setTl(cx2.getTl()+1);
             }
             cx2.setvLig(cx2.getTl(), leaf.getvLig(leaf.getTl()));
