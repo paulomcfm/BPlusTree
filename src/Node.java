@@ -1,5 +1,5 @@
 public class Node {
-    public static final int m=5;
+    public static final int m=4;
     private int vInfo[];
     private int vPos[];
     private Node vLig[];

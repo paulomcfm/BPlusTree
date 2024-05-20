@@ -44,6 +44,27 @@ public class Main {
         System.out.println();
         bTree.inOrdem();
         System.out.println();
+        bTree.remove(14);
+        bTree.ascending();
+        System.out.println();
+        bTree.descending();
+        System.out.println();
+        bTree.inOrdem();
+        System.out.println();
+        bTree.remove(15);
+        bTree.ascending();
+        System.out.println();
+        bTree.descending();
+        System.out.println();
+        bTree.inOrdem();
+        System.out.println();
+        bTree.remove(17);
+        bTree.ascending();
+        System.out.println();
+        bTree.descending();
+        System.out.println();
+        bTree.inOrdem();
+        System.out.println();
     }
 
     public static void insertRandomNumbers(BPlusTree bTree, int count) {
