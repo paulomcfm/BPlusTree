@@ -1,5 +1,5 @@
 public class Node {
-    public static final int m=4;
+    public static final int m=5;
     private int vInfo[];
     private int vPos[];
     private Node vLig[];
@@ -25,6 +25,13 @@ public class Node {
     public int getPosition(int info){
         int pos = 0;
         while(pos<TL && info>=vInfo[pos])
+            pos++;
+        return pos;
+    }
+
+    public int getPositionExclusion(int info) {
+        int pos = 0;
+        while(pos<TL && info>vInfo[pos])
             pos++;
         return pos;
     }
