@@ -292,7 +292,7 @@ public class BPlusTree
         if (posParent+1 <= parent.getTl())
             rightS = parent.getvLig(posParent+1);
 
-        if(leftS!=null && leftS.getTl()> Node.m)
+        if(leftS!=null && leftS.getTl()> (int)Math.ceil((double)(Node.m)/2)-1)
         {
             if(leaf.getvLig(0)==null){
                 leaf.rearrange(0);
@@ -317,7 +317,7 @@ public class BPlusTree
             }
         }
         else
-        if(rightS!=null && rightS.getTl()> Node.m)
+        if(rightS!=null && rightS.getTl()> (int)Math.ceil((double)(Node.m)/2)-1)
         {
             if(leaf.getvLig(0)==null){
                 leaf.setvInfo(leaf.getTl(), rightS.getvInfo(0));

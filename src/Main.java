@@ -31,6 +31,19 @@ public class Main {
         bTree.inOrdem();
         System.out.println();
         bTree.remove(6);
+        bTree.ascending();
+        System.out.println();
+        bTree.descending();
+        System.out.println();
+        bTree.inOrdem();
+        System.out.println();
+        bTree.remove(1);
+        bTree.ascending();
+        System.out.println();
+        bTree.descending();
+        System.out.println();
+        bTree.inOrdem();
+        System.out.println();
     }
 
     public static void insertRandomNumbers(BPlusTree bTree, int count) {
