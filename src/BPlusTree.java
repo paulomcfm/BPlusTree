@@ -210,16 +210,18 @@ public class BPlusTree
     public void ascending()
     {
         Node node = root;
-        while(node.getvLig(0)!=null){
-            node=node.getvLig(0);
-        }
-        for (int i = 0; i < node.getTl(); i++) {
-            System.out.print(node.getvInfo(i)+ " ");
-        }
-        while (node.getNext()!=null) {
-            node=node.getNext();
+        if(node!=null){
+            while (node.getvLig(0) != null) {
+                node = node.getvLig(0);
+            }
             for (int i = 0; i < node.getTl(); i++) {
-                System.out.print(node.getvInfo(i)+ " ");
+                System.out.print(node.getvInfo(i) + " ");
+            }
+            while (node.getNext() != null) {
+                node = node.getNext();
+                for (int i = 0; i < node.getTl(); i++) {
+                    System.out.print(node.getvInfo(i) + " ");
+                }
             }
         }
     }
@@ -227,16 +229,18 @@ public class BPlusTree
     public void descending()
     {
         Node node = root;
-        while(node.getvLig(node.getTl())!=null){
-            node=node.getvLig(node.getTl());
-        }
-        for (int i = node.getTl()-1; i >=0; i--) {
-            System.out.print(node.getvInfo(i)+ " ");
-        }
-        while (node.getPrev()!=null) {
-            node=node.getPrev();
-            for (int i = node.getTl()-1; i >=0; i--) {
-                System.out.print(node.getvInfo(i)+ " ");
+        if(node!=null){
+            while (node.getvLig(node.getTl()) != null) {
+                node = node.getvLig(node.getTl());
+            }
+            for (int i = node.getTl() - 1; i >= 0; i--) {
+                System.out.print(node.getvInfo(i) + " ");
+            }
+            while (node.getPrev() != null) {
+                node = node.getPrev();
+                for (int i = node.getTl() - 1; i >= 0; i--) {
+                    System.out.print(node.getvInfo(i) + " ");
+                }
             }
         }
     }
@@ -282,10 +286,30 @@ public class BPlusTree
         return node;
     }
 
-    private void redistributeConcatenate(Node leaf,int info)
+    private void redistributeConcatenate(Node leaf, int info)
     {
-        Node parent = locateParent(leaf, leaf.getvInfo(0));
-        int posParent = parent.getPosition(leaf.getvInfo(0));
+        Node parent = locateParent(leaf, info);
+        int posParent = parent.getPosition(info);
+        if(leaf.getvLig(0)==null){
+            int posS = leaf.getPositionExclusion(info);
+            Node parentS = locateParent(leaf, info);
+            Node node = locateNode(info);
+            if (node != null && posS == 0) {
+                int posParentS = node.getPositionExclusion(info);
+                if (node.getvInfo(posParentS) == info && leaf.getTl() > 0) {
+                    node.setvInfo(posParentS, leaf.getvInfo(posS));
+                    node.setvPos(posParentS, leaf.getvPos(posS));
+                    info=leaf.getvInfo(posS);
+                } else if (leaf.getTl() == 0) {
+                    Node rightS = parentS.getvLig(parentS.getPositionExclusion(info) + 1);
+                    parentS.setvInfo(parentS.getPositionExclusion(info), rightS.getvInfo(0));
+                    parentS.setvPos(parentS.getPositionExclusion(info), rightS.getvPos(0));
+                    node.setvInfo(posParentS, rightS.getvInfo(0));
+                    node.setvPos(posParentS, rightS.getvPos(0));
+                    info=rightS.getvInfo(0);
+                }
+            }
+        }
         Node leftS = null, rightS = null;
         if (posParent-1 >= 0)
             leftS = parent.getvLig(posParent-1);
@@ -327,6 +351,7 @@ public class BPlusTree
                 rightS.setTl(rightS.getTl()-1);
                 rightS.rearrangeExclusion(0);
                 parent.setvInfo(pos, rightS.getvInfo(0));
+                parent.setvPos(pos, rightS.getvPos(0));
             }else{
                 int pos = parent.getPositionExclusion(leaf.getvInfo(0));
                 leaf.setvInfo(leaf.getTl(), parent.getvInfo(pos));
@@ -388,12 +413,6 @@ public class BPlusTree
                         leaf.getPrev().setNext(rightS);
                     parent.rearrangeExclusion(pos);
                     parent.setTl(parent.getTl()-1);
-                    if (info>0){
-                        Node node = locateNode(info);
-                        int posNode = node.getPositionExclusion(info);
-                        node.setvInfo(posNode, rightS.getvInfo(0));
-                        node.setvPos(posNode, rightS.getvPos(0));
-                    }
                 }else{
                     int pos = parent.getPositionExclusion(leaf.getvInfo(0));
                     rightS.rearrange(0);
@@ -412,52 +431,53 @@ public class BPlusTree
                     parent.setTl(parent.getTl()-1);
                 }
             }
-
             if(root==parent && parent.getTl()==0)
             {
                 if(leftS!=null)
-                    root=leftS;
+                    root=leaf;
                 else
                     root=rightS;
             }
             else if(root!=parent && parent.getTl()< (int)Math.ceil((double)(Node.m)/2)-1)
             {
                 leaf=parent;
-                redistributeConcatenate(leaf, -1);
+                redistributeConcatenate(leaf, info);
             }
         }
     }
 
     public void remove(int info)
     {
-        Node subL, subR;
         Node leaf = locateLeaf(info);
         if (leaf!=null)
         {
             int pos = leaf.getPositionExclusion(info);
-            if(pos==0){
-                Node parent = locateParent(leaf, leaf.getvInfo(0));
-                int posParent = parent.getPositionExclusion(leaf.getvInfo(0));
-                //procura se ele ta em outro lugar alem do pai, se não tiver info=-1
-                if(parent.getvInfo(posParent)==info)
-                    parent.setvInfo(posParent, leaf.getvInfo(1));
-                else{
-                    Node node = locateNode(info);
-                    int posNode = node.getPosition(info);
-                    if (node.getvLig(0) != null && node.getvLig(posNode) == leaf)
-                        info = -1;
-                }
-            }
-            else
-                info=-1;
             leaf.rearrangeExclusion(pos);
             leaf.setTl(leaf.getTl()-1);
-
             if(leaf == root && leaf.getTl()==0)
                 root = null;
             else
             if(leaf != root && leaf.getTl()< (int)Math.ceil((double)(Node.m)/2)-1)
-                redistributeConcatenate(leaf,info);
+                redistributeConcatenate(leaf, info);
+            else {
+                int posS = leaf.getPositionExclusion(info);
+                Node parentS = locateParent(leaf, info);
+                Node node = locateNode(info);
+                if(node!=null && posS==0){
+                    int posParent = node.getPositionExclusion(info);
+                    if(node.getvInfo(posParent)==info && leaf.getTl()>0){
+                        node.setvInfo(posParent, leaf.getvInfo(posS));
+                        node.setvPos(posParent, leaf.getvPos(posS));
+                    }
+                    else if(leaf.getTl()==0){
+                        Node rightS = parentS.getvLig(parentS.getPositionExclusion(info)+1);
+                        parentS.setvInfo(parentS.getPositionExclusion(info), rightS.getvInfo(0));
+                        parentS.setvPos(parentS.getPositionExclusion(info), rightS.getvPos(0));
+                        node.setvInfo(posParent, rightS.getvInfo(0));
+                        node.setvPos(posParent, rightS.getvPos(0));
+                    }
+                }
+            }
         }
     }
 }
